@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome — Obvie World</title>
+
+    <!-- External stylesheet -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Quick embedded styles to ensure the 'hacker' vibe even if style.css is missing -->
+    <style>
+      :root{
+        --bg:#0b0f0b;
+        --panel:#07100a;
+        --green:#33ff77;
+        --muted:#9bd8a8;
+        --glow: 0 0 12px rgba(51,255,119,0.12);
+        --mono: 'Courier New', Courier, monospace;
+      }
+      html,body{
+        height:100%;
+        margin:0;
+        font-family:var(--mono);
+        background:
+          radial-gradient(ellipse at top left, rgba(51,255,119,0.03), transparent 10%),
+          linear-gradient(180deg,#050807 0%, #07100a 60%);
+        color:var(--muted);
+        -webkit-font-smoothing:antialiased;
+        -moz-osx-font-smoothing:grayscale;
+      }
+
+      /* Subtle animated matrix-like vertical lines */
+      body::before{
+        content:"";
+        position:fixed;
+        inset:0;
+        background-image:
+          linear-gradient(180deg, rgba(51,255,119,0.02) 0, rgba(51,255,119,0.00) 40%),
+          repeating-linear-gradient(180deg, rgba(0,0,0,0.03) 0 1px, transparent 1px 8px);
+        mix-blend-mode:screen;
+        pointer-events:none;
+        opacity:0.65;
+        animation:float 10s linear infinite;
+      }
+      @keyframes float { from { transform:translateY(0) } to { transform:translateY(-1200px) } }
+
+      .container{
+        max-width:820px;
+        margin:6.5vh auto;
+        background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+        border-radius:12px;
+        padding:42px;
+        box-shadow: var(--glow);
+        border:1px solid rgba(51,255,119,0.06);
+        display:flex;
+        gap:28px;
+        align-items:center;
+      }
+
+      .left-panel{
+        width:120px;
+        height:120px;
+        border-radius:8px;
+        background:
+          conic-gradient(from 180deg at 50% 50%, rgba(51,255,119,0.06), rgba(0,0,0,0.02));
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:28px;
+        color:var(--green);
+        box-shadow:0 6px 18px rgba(0,0,0,0.6);
+        flex-shrink:0;
+        border:1px solid rgba(51,255,119,0.08);
+      }
+
+      .meta{
+        flex:1;
+      }
+
+      h1{
+        margin:0 0 8px 0;
+        color:var(--green);
+        font-size:34px;
+        letter-spacing:0.6px;
+        text-shadow:0 2px 12px rgba(51,255,119,0.06);
+      }
+
+      p.lead{
+        margin:0 0 18px 0;
+        color:var(--muted);
+        opacity:0.95;
+      }
+
+      .status{
+        display:inline-block;
+        background:rgba(0,0,0,0.25);
+        border:1px dashed rgba(51,255,119,0.08);
+        padding:10px 14px;
+        border-radius:6px;
+        color:var(--green);
+        font-size:13px;
+        margin-top:10px;
+      }
+
+      .find-state{
+        display:inline-block;
+        margin-top:14px;
+        padding:12px 18px;
+        border-radius:8px;
+        border:1px solid rgba(51,255,119,0.14);
+        background:linear-gradient(180deg, rgba(51,255,119,0.03), rgba(0,0,0,0.02));
+        color:var(--green);
+        font-weight:700;
+        cursor:pointer;
+        box-shadow: 0 8px 24px rgba(3,6,4,0.5);
+        transition:transform .12s ease, box-shadow .12s ease;
+      }
+      .find-state:hover{ transform:translateY(-3px); box-shadow:0 14px 40px rgba(3,6,4,0.6) }
+
+      /* small terminal block to show live messages */
+      .terminal{
+        margin-top:18px;
+        background:#021006;
+        border-radius:8px;
+        padding:14px;
+        font-size:13px;
+        color: #b7f6d1;
+        max-height:160px;
+        overflow:auto;
+        border:1px solid rgba(51,255,119,0.04);
+      }
+
+      footer{
+        margin-top:18px;
+        font-size:12px;
+        color:rgba(155,216,168,0.6);
+      }
+
+      @media (max-width:600px){
+        .container{ padding:20px; margin:4vh 12px; flex-direction:column; align-items:flex-start }
+        .left-panel{ width:86px; height:86px; font-size:20px }
+        h1{ font-size:22px }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container" role="main" aria-labelledby="welcome">
+      <div class="left-panel" aria-hidden="true">OB</div>
+
+      <div class="meta">
+        <h1 id="welcome">Welcome to Obvie World</h1>
+        <p class="lead">Find your state to continue — your browser will ask to share location. This site respects permission and consent.</p>
+
+        <!-- status element (kept for compatibility with your main.js) -->
+        <div class="status" id="status">Idle</div>
+
+        <!-- action button -->
+        <br />
+        <button class="find-state" id="findStateBtn">Find my state to continue</button>
+
+        <!-- small terminal-like log for instant feedback -->
+        <div class="terminal" id="terminal" aria-live="polite">
+          ▶ Ready.
+        </div>
+
+        <footer>Obvie World · Client-side geolocation (consent required)</footer>
+      </div>
+    </div>
+
+    <!--
+      The explicit string used to call the app's client script.
+      You can change MAIN_JS_SRC if your file sits somewhere else (e.g., "assets/js/main.js").
+      This is the string you requested that names the main script file.
+    -->
+    <script>
+      // --- string for calling main.js (editable) ---
+      const MAIN_JS_SRC = 'main.js';
+
+      // Dynamic loader: will inject the main script using the above string.
+      // This also keeps an explicit record in the DOM of which file is being called.
+      (function loadMainScript(){
+        try {
+          const s = document.createElement('script');
+          s.src = MAIN_JS_SRC;
+          s.defer = true;
+          s.id = 'main-script';
+          s.setAttribute('data-called-by', 'index.html');
+          document.body.appendChild(s);
+          // expose for debugging
+          window.MAIN_JS_CALL = MAIN_JS_SRC;
+          console.log('Main script queued:', MAIN_JS_SRC);
+        } catch (e) {
+          console.error('Failed to load main script:', e);
+          const t = document.getElementById('terminal');
+          if (t) t.innerText += '\n✖ Failed to load main script';
+        }
+      })();
+    </script>
+  </body>
+</html>
